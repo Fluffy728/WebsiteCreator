@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluffy278's HTML Website Creator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        /* Custom font for a clean look */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Basic styling for the preview area to make it readable */
+        #preview-area h1 { font-size: 2em; margin-bottom: 0.5em; font-weight: bold; }
+        #preview-area h2 { font-size: 1.5em; margin-bottom: 0.4em; font-weight: bold; }
+        #preview-area h3 { font-size: 1.25em; margin-bottom: 0.3em; font-weight: bold; }
+        #preview-area p { margin-bottom: 1em; line-height: 1.6; }
+        #preview-area ul, #preview-area ol { list-style-position: inside; margin-bottom: 1em; padding-left: 1.5em; }
+        #preview-area li { margin-bottom: 0.5em; }
+        #preview-area a { color: #3b82f6; text-decoration: underline; }
+        #preview-area pre {
+            background-color: #f3f4f6;
+            padding: 1em;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1em;
+        }
+        #preview-area code {
+            font-family: 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
+            background-color: #e5e7eb;
+            padding: 0.2em 0.4em;
+            border-radius: 0.25rem;
+        }
+        #preview-area blockquote {
+            border-left: 4px solid #d1d5db;
+            padding-left: 1em;
+            color: #6b7280;
+            margin-bottom: 1em;
+        }
+        #preview-area table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1em;
+        }
+        #preview-area th, #preview-area td {
+            border: 1px solid #e5e7eb;
+            padding: 0.75em;
+            text-align: left;
+        }
+        #preview-area th {
+            background-color: #f9fafb;
+            font-weight: bold;
+        }
+        #preview-area img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin-top: 1em;
+            margin-bottom: 1em;
+            display: block; /* Ensures images don't have extra space below them */
+        }
+
+        /* Message box styling */
+        .message-box {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4CAF50; /* Green */
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none; /* Hidden by default */
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .message-box.show {
+            display: block;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-5xl w-full bg-white p-6 rounded-xl shadow-lg">
+        <h1 class="text-3xl font-extrabold text-gray-900 text-center mb-8">Fluffy728's HTML Website Creator</h1>
+        <h2 class="text-3xl font-extrabold text-gray-900 text-center mb-8">Use Markdown? Now you can make HTML with the help of Markdown!</h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+                <label for="markdown-input" class="block text-lg font-medium text-gray-700 mb-2">Write your content in Markdown:</label>
+                <textarea id="markdown-input"
+                          class="w-full p-4 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 h-96 resize-y text-gray-800"
+                          placeholder="Start typing your Markdown here...
+# Welcome to My Page
+
+This is a **simple** example of a web page created with Markdown.
+
+## Features:
+* Easy to use
+* Live preview
+* Copy and download HTML
+
+### Code Example:
+```javascript
+function helloWorld() {
+    console.log('Hello, World!');
+}
+helloWorld();
+```
+
+> This is a blockquote.
+
+[Visit Google](https://www.google.com)
+
+| Header 1 | Header 2 |
+|----------|----------|
+| Data 1   | Data 2   |
+| Data 3   | Data 4   |"
+                ></textarea>
+                <div class="mt-4 flex flex-wrap justify-end gap-3">
+                    <button id="generate-html-btn"
+                            class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                        Generate & Preview HTML
+                    </button>
+                    <button id="copy-html-btn"
+                            class="px-6 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                        Copy HTML
+                    </button>
+                    <button id="download-html-btn"
+                            class="px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg shadow-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                        Download HTML
+                    </button>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-lg font-medium text-gray-700 mb-2">HTML Preview:</label>
+                <div id="preview-area"
+                     class="w-full p-4 border border-gray-300 bg-gray-50 rounded-lg h-96 overflow-y-auto shadow-inner text-gray-800">
+                    <p class="text-gray-500 italic">Your HTML preview will appear here after you type Markdown and click "Generate & Preview HTML".</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="message-box" class="message-box"></div>
+
+    <script>
+        // Get references to DOM elements
+        const markdownInput = document.getElementById('markdown-input');
+        const generateHtmlBtn = document.getElementById('generate-html-btn');
+        const copyHtmlBtn = document.getElementById('copy-html-btn');
+        const downloadHtmlBtn = document.getElementById('download-html-btn');
+        const previewArea = document.getElementById('preview-area');
+        const messageBox = document.getElementById('message-box');
+
+        /**
+         * Displays a temporary message box with the given text.
+         * @param {string} message - The message to display.
+         * @param {string} type - The type of message (e.g., 'success', 'error').
+         */
+        function showMessageBox(message, type = 'success') {
+            messageBox.textContent = message;
+            messageBox.className = 'message-box show'; // Reset classes and show
+            if (type === 'success') {
+                messageBox.style.backgroundColor = '#4CAF50'; // Green
+            } else if (type === 'error') {
+                messageBox.style.backgroundColor = '#f44336'; // Red
+            }
+
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+                messageBox.style.opacity = 0; // Fade out
+            }, 3000); // Hide after 3 seconds
+        }
+
+        /**
+         * Converts Markdown input to HTML and updates the preview area.
+         */
+        function updatePreview() {
+            try {
+                const markdownText = markdownInput.value;
+                // Use marked.js to convert Markdown to HTML
+                const htmlContent = marked.parse(markdownText);
+                previewArea.innerHTML = htmlContent;
+                showMessageBox('HTML preview updated!', 'success');
+            } catch (error) {
+                console.error("Error converting Markdown:", error);
+                previewArea.innerHTML = `<p class="text-red-500">Error rendering Markdown: ${error.message}</p>`;
+                showMessageBox('Error updating preview.', 'error');
+            }
+        }
+
+        /**
+         * Copies the generated HTML to the clipboard.
+         */
+        function copyHtmlToClipboard() {
+            try {
+                // Create a temporary textarea to hold the HTML content
+                const tempTextArea = document.createElement('textarea');
+                tempTextArea.value = previewArea.innerHTML; // Get the raw HTML from the preview area
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                document.execCommand('copy'); // Use execCommand for broader compatibility in iframes
+                document.body.removeChild(tempTextArea);
+                showMessageBox('HTML copied to clipboard!', 'success');
+            } catch (err) {
+                console.error('Failed to copy HTML: ', err);
+                showMessageBox('Failed to copy HTML.', 'error');
+            }
+        }
+
+        /**
+         * Downloads the generated HTML as an .html file.
+         */
+        function downloadHtmlFile() {
+            try {
+                const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Generated Page</title>
+    <style>
+        /* Basic styles for the generated content to ensure readability */
+        body { font-family: 'Inter', sans-serif; line-height: 1.6; color: #333; margin: 20px; }
+        h1, h2, h3, h4, h5, h6 { margin-top: 1em; margin-bottom: 0.5em; font-weight: bold; }
+        h1 { font-size: 2em; }
+        h2 { font-size: 1.5em; }
+        h3 { font-size: 1.25em; }
+        p { margin-bottom: 1em; }
+        ul, ol { list-style-position: inside; margin-bottom: 1em; padding-left: 1.5em; }
+        a { color: #3b82f6; text-decoration: underline; }
+        pre { background-color: #f3f4f6; padding: 1em; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1em; }
+        code { font-family: 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace; background-color: #e5e7eb; padding: 0.2em 0.4em; border-radius: 0.25rem; }
+        blockquote { border-left: 4px solid #d1d5db; padding-left: 1em; color: #6b7280; margin-bottom: 1em; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1em; }
+        th, td { border: 1px solid #e5e7eb; padding: 0.75em; text-align: left; }
+        th { background-color: #f9fafb; font-weight: bold; }
+        img { max-width: 100%; height: auto; border-radius: 0.5rem; display: block; margin: 1em 0; }
+    </style>
+</head>
+<body>
+    ${previewArea.innerHTML}
+</body>
+</html>`;
+
+                const blob = new Blob([htmlContent], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'my-website.html';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url); // Clean up the URL object
+                showMessageBox('HTML file downloaded!', 'success');
+            } catch (err) {
+                console.error('Failed to download HTML file: ', err);
+                showMessageBox('Failed to download HTML file.', 'error');
+            }
+        }
+
+        // Event Listeners
+        generateHtmlBtn.addEventListener('click', updatePreview);
+        copyHtmlBtn.addEventListener('click', copyHtmlToClipboard);
+        downloadHtmlBtn.addEventListener('click', downloadHtmlFile);
+
+        // Initial preview update when the page loads
+        window.onload = function() {
+            updatePreview();
+        };
+    </script>
+</body>
+</html>
